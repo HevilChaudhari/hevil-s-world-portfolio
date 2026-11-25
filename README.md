@@ -1,0 +1,146 @@
+<div align="center">
+
+# HEVIL'S WORLD
+
+**An interactive developer portfolio you can walk through.**
+
+Explore a pixel-art countryside village, talk to its villagers and step into its buildings to discover projects, test cases, vlogs, notes and experience. Prefer a regular website? Every page is one click away from the menu.
+
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)
+![Phaser](https://img.shields.io/badge/Phaser-3.90-8B5CF6)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
+![Hosting](https://img.shields.io/badge/hosting-GitHub_Pages-222222?logo=github)
+
+</div>
+
+![The village square with the Projects Workshop and the Developer's Forge](docs/screenshots/village-square.png)
+
+> **Status: in active development.** The village, navigation and project pages are built; the remaining pages and final art are in progress (see [Roadmap](#roadmap)). All artwork is currently a temporary placeholder generated in code.
+
+## Highlights
+
+- **A playable village as the homepage.** Walk, jump and explore a side-scrolling countryside with hills, a river, windmills and parallax mountains, built from reusable tiles rather than one big background image.
+- **Seven portfolio locations.** My Home, Projects Workshop, Developer's Forge, Testing Laboratory, Knowledge Library, Vlog House, and the Resume & Contact Castle, each with a readable pixel signboard.
+- **Villagers with branching dialogue.** NPCs with portraits, typewriter text and keyboard, number-key or mouse choices that lead straight to the matching page.
+- **Never forced to play.** A header and a building menu reach every page, with optional "walk there" fast travel. Coming back to the village returns you to the door you used.
+- **Data-driven content.** Projects, dialogues, buildings and pages are plain TypeScript data. Adding a project means adding one object; missing details show a clearly marked placeholder instead of invented text.
+- **Crisp pixel art at any size.** The game renders at 480×270 and scales by whole numbers, so pixels stay sharp.
+- **Static and fast.** No backend. Each page is its own lazy-loaded chunk, and the game engine downloads only when the village is opened.
+- **Accessible by design.** Keyboard navigation, focus management, screen-reader announcements, and respect for the reduced-motion setting.
+
+## Screenshots
+
+| Dialogue with a villager | Resume & Contact Castle |
+|---|---|
+| ![Dialogue with the Village Guide](docs/screenshots/dialogue.png) | ![The castle on the hill](docs/screenshots/castle.png) |
+
+| Building menu (no walking required) | Projects |
+|---|---|
+| ![Site menu listing every building and page](docs/screenshots/site-menu.png) | ![Projects page](docs/screenshots/projects.png) |
+
+## How it works
+
+The project keeps the game and the website as two separate layers that talk through a small typed event bus.
+
+```mermaid
+flowchart LR
+    subgraph Website["React website"]
+        Router["HashRouter + lazy pages"]
+        HUD["Game HUD: prompts, dialogue, menu"]
+        Pages["Portfolio pages"]
+    end
+    subgraph Game["Phaser game"]
+        Scene["Village scene"]
+        Systems["Input, physics, interactions"]
+    end
+    Data[("src/data: pages, buildings, dialogues, projects")]
+
+    Scene <-->|typed EventBus| HUD
+    HUD -->|open page| Router --> Pages
+    Data --> Scene
+    Data --> HUD
+    Data --> Pages
+```
+
+- **Game (`src/game/`)**: Phaser 3 scenes, the player and NPCs, a data-driven tilemap, collision and an interaction system. It never imports React.
+- **Website (`src/components/`, `src/pages/`)**: React pages, the HUD drawn over the canvas, navigation and pixel-block transitions.
+- **Content (`src/data/`)**: framework-free data shared by both layers, so text lives in one place.
+
+## Tech stack
+
+| Area | Technology |
+|---|---|
+| UI | React 19, TypeScript 5.9, Tailwind CSS 4 |
+| Game | Phaser 3.90 (Arcade physics, tilemaps) |
+| Routing | React Router 7 with `HashRouter` for static hosting |
+| Animation | GSAP for page transitions, loaded on first use |
+| Tooling | Vite 8, ESLint with typescript-eslint |
+| Hosting | GitHub Pages (static) |
+
+## Getting started
+
+**Prerequisites:** Node.js 20.19 or newer.
+
+```bash
+git clone https://github.com/HevilChaudhari/hevil-s-world-portfolio.git
+cd hevil-s-world-portfolio
+npm install
+npm run dev
+```
+
+Open http://localhost:5173.
+
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Start the dev server with hot reload |
+| `npm run build` | Type-check and build to `dist/` |
+| `npm run preview` | Serve the production build locally |
+| `npm run check` | Type-check, lint and build in one step |
+
+### Controls
+
+| Key | Action |
+|---|---|
+| A / D or ← / → | Walk |
+| W / ↑ / Space | Jump |
+| E | Talk, read, or enter a building |
+| Esc | Open the menu |
+
+## Project structure
+
+```
+src/
+├── app/          App shell, routes, lazy page registry
+├── components/   Game host and HUD, dialogue, layout, navigation, transitions
+├── data/         Content: pages, buildings, NPCs, dialogues, projects, test cases
+├── game/         Phaser game: scenes, entities, maps, systems, placeholder art
+├── hooks/        Shared React hooks
+├── pages/        One folder per page
+├── types/        Content types
+└── utils/        Helpers
+docs/             Development guide and screenshots
+public/           Static assets (art, audio, documents)
+```
+
+## Customising
+
+The [development guide](docs/DEVELOPMENT.md) covers editing the village layout, dialogues and projects, adding pages, replacing the placeholder art (with the exact sizes each asset needs), and the GitHub Pages base-path setup.
+
+## Roadmap
+
+- [x] Project setup and architecture
+- [x] Village environment and player movement
+- [x] Collision and interaction system
+- [x] Buildings, NPCs and dialogue
+- [x] React integration, routing and navigation
+- [x] Projects listing and data-driven project pages
+- [ ] Test Cases, Vlogs, Technical Notes, Architecture, Resume, Experience and About pages
+- [ ] Mobile controls and responsive layouts
+- [ ] Performance work and automated tests
+- [ ] Automated GitHub Pages deployment
+
+## Deployment
+
+The site is fully static. It uses a relative base path and hash-based routing, so the same build works at `https://<user>.github.io/` and at `https://<user>.github.io/<repository>/` without configuration. An automated GitHub Actions deployment is on the roadmap.

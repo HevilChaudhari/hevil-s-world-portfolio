@@ -1,0 +1,90 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens: the countryside palette. Keep in sync with PALETTE in
+ * src/game/config/constants.ts so the website and the game feel like one world.
+ */
+@theme {
+  --color-sky: #8ecae6;
+  --color-sky-deep: #5b9bbf;
+  --color-meadow: #7cc35f;
+  --color-grass: #5a9e4b;
+  --color-grass-dark: #3f6b3a;
+  --color-soil: #8b5e3c;
+  --color-soil-dark: #4a2f1b;
+  --color-wheat: #f4d35e;
+  --color-parchment: #f6e7c1;
+  --color-sunset: #e76f51;
+  --color-night: #1f2a24;
+
+  /*
+   * Pixel display font. Placeholder stack: a self-hosted pixel font
+   * (e.g. a .woff2 in public/assets/ui/fonts) will be added in a later phase.
+   */
+  --font-pixel: 'Courier New', ui-monospace, monospace;
+  --font-sans: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  --animate-panel-in: panel-in 150ms ease-out;
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-night font-sans text-parchment antialiased;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-wheat);
+    outline-offset: 2px;
+  }
+}
+
+/* Chunky stepped border that reads as pixel art at any size. */
+@utility pixel-border {
+  box-shadow:
+    0 -3px 0 0 var(--color-soil-dark),
+    0 3px 0 0 var(--color-soil-dark),
+    -3px 0 0 0 var(--color-soil-dark),
+    3px 0 0 0 var(--color-soil-dark);
+}
+
+/* Blueprint paper: project placeholders and architecture diagrams. */
+@utility blueprint {
+  background-color: #2f5f86;
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.12) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Stepped grass edge used under page heroes. */
+@utility pixel-grass {
+  background:
+    linear-gradient(var(--color-meadow), var(--color-meadow)) top / 100% 6px no-repeat,
+    repeating-linear-gradient(90deg, var(--color-grass) 0 8px, var(--color-meadow) 8px 12px, var(--color-grass) 12px 20px) top 6px left / 100% 4px no-repeat,
+    var(--color-grass);
+  box-shadow: 0 4px 0 0 var(--color-soil);
+}
+
+@utility pixel-button {
+  @apply pixel-border inline-block font-pixel font-bold transition-transform active:translate-y-0.5 motion-reduce:transition-none;
+}
+
+@layer components {
+  /* Phaser sets pixelArt: true; this guarantees the scaled canvas stays crisp. */
+  .game-host canvas {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+}
