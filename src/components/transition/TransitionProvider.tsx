@@ -17,20 +17,34 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
   const reducedMotion = useReducedMotion();
   const overlayRef = useRef<HTMLDivElement>(null);
   const busyRef = useRef(false);
+  /** Navigation to run when the screen is fully covered; a newer request replaces it. */
+  const pendingRef = useRef<(() => void) | null>(null);
+  const midpointPassedRef = useRef(false);
 
   const run = useCallback(
     (midpoint: () => void) => {
       const overlay = overlayRef.current;
-      if (reducedMotion || !overlay || busyRef.current) {
+      if (reducedMotion || !overlay) {
         midpoint();
         return;
       }
+      if (busyRef.current) {
+        // A transition is already running: the latest request wins. While the
+        // screen is still covering, replace the pending navigation; once it is
+        // uncovering, apply this one straight away.
+        if (midpointPassedRef.current) midpoint();
+        else pendingRef.current = midpoint;
+        return;
+      }
       busyRef.current = true;
-      let midpointDone = false;
+      midpointPassedRef.current = false;
+      pendingRef.current = midpoint;
       const reachMidpoint = () => {
-        if (midpointDone) return;
-        midpointDone = true;
-        midpoint();
+        if (midpointPassedRef.current) return;
+        midpointPassedRef.current = true;
+        const next = pendingRef.current;
+        pendingRef.current = null;
+        next?.();
       };
 
       void (async () => {
@@ -58,7 +72,9 @@ export function TransitionProvider({ children }: { children: ReactNode }) {
 
   const go = useCallback(
     (to: string) => {
-      if (to === pathname) {
+      // Same page and nothing in flight: just scroll up. (While a transition is
+      // running, still go through run() so this request replaces the pending one.)
+      if (to === pathname && !busyRef.current) {
         window.scrollTo({ top: 0 });
         return;
       }

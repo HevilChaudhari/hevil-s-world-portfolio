@@ -25,7 +25,9 @@ Everything needed to change the village, its content and its art. For setup and 
 | `npm run preview` | Serve the production build (http://localhost:4173) |
 | `npm run typecheck` | TypeScript only |
 | `npm run lint` | ESLint |
-| `npm run check` | Type-check, lint and build in one go |
+| `npm run test` | Unit tests (Vitest), once |
+| `npm run test:watch` | Unit tests, re-running on change |
+| `npm run check` | Type-check, lint, unit tests and build in one go |
 
 Dev-only helpers:
 

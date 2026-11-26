@@ -81,7 +81,7 @@ flowchart LR
 
 ## Getting started
 
-**Prerequisites:** Node.js 20.19 or newer.
+**Prerequisites:** Node.js 22.12 or newer.
 
 ```bash
 git clone https://github.com/HevilChaudhari/hevil-s-world-portfolio.git
@@ -139,7 +139,7 @@ The [development guide](docs/DEVELOPMENT.md) covers editing the village layout, 
 - [x] Test Cases, Vlogs, Resume, Experience and About pages (data-driven; content being filled in)
 - [ ] Technical Notes and Architecture pages
 - [x] Mobile touch controls, Simple view and responsive layouts
-- [ ] Performance work and automated tests
+- [x] Performance work and automated tests
 - [ ] Automated GitHub Pages deployment
 
 ## Deployment

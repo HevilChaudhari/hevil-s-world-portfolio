@@ -28,6 +28,10 @@ export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
     },
     // React owns the page; Phaser should not grab keyboard focus from other UI.
     input: { keyboard: { target: window } },
+    // No sound yet: skip creating a Web Audio context on every mount (~70 ms, plus
+    // Chrome's "AudioContext was not allowed to start" warning before a click).
+    // Remove this when audio files are added to public/assets/audio/.
+    audio: { noAudio: true },
     banner: false,
     scene: [BootScene, PreloadScene, VillageScene],
   };
