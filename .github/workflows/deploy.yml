@@ -1,0 +1,65 @@
+# Builds the site and publishes it to GitHub Pages on every push to main.
+# One-time setup: repository Settings → Pages → Build and deployment → Source: "GitHub Actions".
+# Works for both https://USER.github.io/ and https://USER.github.io/REPOSITORY/:
+# the app uses relative paths and hash routing, and only 404.html needs the base
+# path, which actions/configure-pages provides (no repository name is hardcoded).
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time; let an in-progress deployment finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - id: pages
+        uses: actions/configure-pages@v6
+
+      - name: Type-check, lint, test and build
+        run: npm run check
+        env:
+          # "" for USER.github.io or a custom domain, "/REPOSITORY" for a project site.
+          PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+
+      - name: Verify the bundle
+        run: |
+          # The website shell must not download Phaser up front.
+          if grep -q 'phaser-' dist/index.html; then echo "index.html references the Phaser chunk"; exit 1; fi
+          # Development-only example content must never ship.
+          if grep -rq 'dev preview' dist/assets; then echo "Development fixtures found in dist/"; exit 1; fi
+          test -f dist/404.html
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

@@ -13,6 +13,7 @@ Everything needed to change the village, its content and its art. For setup and 
 - [Test cases, vlogs, resume, experience and About](#test-cases-vlogs-resume-experience-and-about)
 - [Adding a page](#adding-a-page)
 - [Replacing placeholder art](#replacing-placeholder-art)
+- [Deploying to GitHub Pages](#deploying-to-github-pages)
 - [GitHub Pages base path](#github-pages-base-path)
 
 ## Commands
@@ -167,6 +168,39 @@ Keep the placeholder's size and layout:
 | Villagers | `npcGuide`, `npcWorkshopKeeper`, `npcQaEngineer`, `npcLibrarian`, `npcVideoCreator` | 2 idle frames of 16x24, facing right; frame 0 is also the dialogue portrait |
 
 Building name boards are drawn from text with a built-in 5 px pixel font (`src/game/assets/pixelFont.ts`), so they update automatically when a building's `signLines` change.
+
+## Deploying to GitHub Pages
+
+Deployment is automated by `.github/workflows/deploy.yml`, which runs on every push to `main` (or by hand from the Actions tab, "Run workflow").
+
+**One-time setup:** repository **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+
+What the workflow does:
+
+1. Installs dependencies with `npm ci` on Node 24.
+2. Runs `npm run check` (type-check, lint, unit tests, build).
+3. Verifies the bundle: `index.html` must not load Phaser, and no development example content may be in `dist/`.
+4. Uploads `dist/` and publishes it with GitHub's official Pages actions. The run summary links to the live site.
+
+`.github/workflows/ci.yml` runs steps 1–2 on every other branch and on pull requests, so problems show up before merging.
+
+**Where the site appears:**
+
+| Repository name | URL |
+|---|---|
+| `<user>.github.io` | `https://<user>.github.io/` |
+| anything else | `https://<user>.github.io/<repository>/` |
+| with a custom domain set in Settings → Pages | that domain |
+
+**Links:** every page has a hash URL such as `…/#/resume`, which works when opened directly, bookmarked or shared. A path without the hash (`…/resume`) is served GitHub's 404 page, which here is a generated `404.html` that forwards to `…/#/resume`; unknown paths end on the site's own Not Found page. The deploy workflow passes the site's base path to that file from `actions/configure-pages` (`PAGES_BASE_PATH`); built by hand without it, the page works the base out from the known routes.
+
+**Deploying by hand** (any static host): run `npm run build` and upload the contents of `dist/`.
+
+**Troubleshooting:**
+
+- *The deploy job fails with a Pages permission or "not found" error:* the Pages source is not set to GitHub Actions yet (see one-time setup).
+- *The build job fails:* run `npm run check` locally; it runs the same steps.
+- *A file in `public/` is missing on the live site:* check that it is referenced without a leading `/` and through `assetUrl()`/`mediaUrl()`; file names are case-sensitive on GitHub Pages.
 
 ## GitHub Pages base path
 

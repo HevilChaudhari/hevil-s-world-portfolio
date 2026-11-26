@@ -1,0 +1,27 @@
+# Runs the same checks as the deployment on every other branch and on pull
+# requests, so problems show up before anything is merged into main.
+name: CI
+
+on:
+  push:
+    branches-ignore: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check, lint, test and build
+        run: npm run check

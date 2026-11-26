@@ -3,6 +3,8 @@ import { fileURLToPath, URL } from 'node:url';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import { PAGES } from './src/data/pages.ts';
+import { githubPages404 } from './scripts/githubPages404.ts';
 
 /**
  * Base path
@@ -19,7 +21,16 @@ export default defineConfig(({ mode }) => {
 
   return {
     base,
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react(),
+      tailwindcss(),
+      // dist/404.html forwards hash-less paths (/repo/resume) to /repo/#/resume.
+      // PAGES_BASE_PATH comes from actions/configure-pages in the deploy workflow.
+      githubPages404({
+        basePath: process.env.PAGES_BASE_PATH,
+        routeSegments: [...new Set(Object.values(PAGES).map((page) => page.path.split('/')[1]))],
+      }),
+    ],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),

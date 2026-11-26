@@ -96,8 +96,9 @@ Open http://localhost:5173.
 |---|---|
 | `npm run dev` | Start the dev server with hot reload |
 | `npm run build` | Type-check and build to `dist/` |
-| `npm run preview` | Serve the production build locally |
-| `npm run check` | Type-check, lint and build in one step |
+| `npm run preview` | Serve the production build locally (http://localhost:4173) |
+| `npm run test` | Run the unit tests (Vitest) |
+| `npm run check` | Type-check, lint, test and build in one step (what CI runs) |
 
 ### Controls
 
@@ -107,6 +108,8 @@ Open http://localhost:5173.
 | W / ↑ / Space | Jump |
 | E | Talk, read, or enter a building |
 | Esc | Open the menu |
+
+On phones and tablets, on-screen controls appear instead (◀ ▶ to walk, **Jump**, **Use**). The **Simple view** button lists every page without the game.
 
 ## Project structure
 
@@ -126,7 +129,12 @@ public/           Static assets (art, audio, documents)
 
 ## Customising
 
-The [development guide](docs/DEVELOPMENT.md) covers editing the village layout, dialogues and projects, adding pages, replacing the placeholder art (with the exact sizes each asset needs), and the GitHub Pages base-path setup.
+- **Content** lives in `src/data/`: projects, test cases, vlogs, experience and the profile used by Resume and About. Each file starts with a commented example; anything left out shows a clearly marked *To be added* box.
+- **Resume PDF:** put it at `public/documents/resume.pdf` and set `resumePdf: 'documents/resume.pdf'` in `src/data/profile.ts`.
+- **Art:** all artwork is currently generated in code. To replace a piece, put the file in `public/assets/`, register it in `src/game/config/assetKeys.ts` under the same key, and keep the placeholder's size and frame layout.
+- **Images and videos** for pages go in `public/assets/` and are referenced without a leading `/` (for example `assets/projects/<slug>/screen.png`), so they work on any base path.
+
+The [development guide](docs/DEVELOPMENT.md) has the details: editing the village layout and dialogues, every data file, adding pages, the exact size of each art asset, and deployment.
 
 ## Roadmap
 
@@ -140,8 +148,14 @@ The [development guide](docs/DEVELOPMENT.md) covers editing the village layout, 
 - [ ] Technical Notes and Architecture pages
 - [x] Mobile touch controls, Simple view and responsive layouts
 - [x] Performance work and automated tests
-- [ ] Automated GitHub Pages deployment
+- [x] Automated GitHub Pages deployment
 
 ## Deployment
 
-The site is fully static. It uses a relative base path and hash-based routing, so the same build works at `https://<user>.github.io/` and at `https://<user>.github.io/<repository>/` without configuration. An automated GitHub Actions deployment is on the roadmap.
+The site is fully static and deploys to GitHub Pages with GitHub Actions (`.github/workflows/deploy.yml`).
+
+1. In the repository, open **Settings → Pages** and set **Source** to **GitHub Actions** (one time).
+2. Push to `main`. The workflow type-checks, lints, tests and builds, then publishes `dist/`.
+3. The site appears at `https://<user>.github.io/<repository>/`, or at `https://<user>.github.io/` if the repository is named `<user>.github.io`.
+
+The same build works at both addresses: it uses relative paths and hash routing (`/#/resume`), so the repository name is never hardcoded. Links without the hash, such as `/<repository>/resume`, are forwarded to the right page. Other branches and pull requests run the same checks without deploying (`.github/workflows/ci.yml`). See the [development guide](docs/DEVELOPMENT.md#deploying-to-github-pages) for details and troubleshooting.
