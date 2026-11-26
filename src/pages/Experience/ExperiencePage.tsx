@@ -1,18 +1,35 @@
-import { ComingSoon } from '@/components/layout/ComingSoon';
+import { ExampleDataToggle } from '@/components/content/ExampleDataToggle';
+import { Missing } from '@/components/content/Missing';
 import { PageLayout } from '@/components/layout/PageLayout';
-
-/** Content arrives in Phase 7; until then this page shows a clearly marked placeholder. */
-const PLANNED_SECTIONS = [
-  'Company, job title and employment dates',
-  'Responsibilities and technical contributions',
-  'Projects and achievements',
-  'Technologies used',
-] as const;
+import { ExperienceCard } from '@/components/profile/ExperienceCard';
+import { Timeline } from '@/components/profile/Timeline';
+import { getExperience } from '@/data/experience';
+import { useExampleContent } from '@/hooks/useExampleContent';
+import { formatDateRange } from '@/utils/formatDate';
 
 export default function ExperiencePage() {
+  const example = useExampleContent();
+  const entries = getExperience(example);
+
   return (
     <PageLayout pageId="experience">
-      <ComingSoon sections={PLANNED_SECTIONS} />
+      {import.meta.env.DEV && <ExampleDataToggle active={example} />}
+
+      {entries.length === 0 ? (
+        <Missing
+          what="Work experience"
+          hint="Add roles to src/data/experience.ts, newest first: company, job title, employment dates, responsibilities, technical contributions, projects, achievements and technologies."
+        />
+      ) : (
+        <Timeline
+          label="Work experience, newest first"
+          items={entries.map((entry) => ({
+            key: entry.id,
+            when: formatDateRange(entry.start, entry.end) ?? <span className="text-sunset">Dates to be added</span>,
+            content: <ExperienceCard entry={entry} />,
+          }))}
+        />
+      )}
     </PageLayout>
   );
 }

@@ -10,6 +10,7 @@ Everything needed to change the village, its content and its art. For setup and 
 - [Editing the village](#editing-the-village)
 - [Editing content](#editing-content)
 - [Adding and editing projects](#adding-and-editing-projects)
+- [Test cases, vlogs, resume, experience and About](#test-cases-vlogs-resume-experience-and-about)
 - [Adding a page](#adding-a-page)
 - [Replacing placeholder art](#replacing-placeholder-art)
 - [GitHub Pages base path](#github-pages-base-path)
@@ -31,6 +32,7 @@ Dev-only helpers:
 - `http://localhost:5173/?debug` draws physics bodies and collision boxes.
 - `window.__HEVIL_GAME__` exposes the running Phaser game in the browser console (dev server only, stripped from production builds).
 - `#/projects/example-project` shows a fully filled, fictional project page, and "Dev only" checklists list missing project fields. Neither appears in production builds.
+- Add `?example` to the Test Cases, Vlogs, Resume, Experience or About page (e.g. `#/resume?example`) to preview it filled with fictional data from `src/data/examples/`. A "Dev only" bar on each page toggles it. Production builds ignore the parameter and never include the fixtures.
 
 ## Controls
 
@@ -106,6 +108,19 @@ Projects live in `src/data/projects.ts`. The top of that file has a commented ex
 - Videos: set `youtubeId` (played through youtube-nocookie.com and loaded only when the visitor clicks) or a self-hosted `src`.
 - Architecture diagrams: `{ kind: 'layers', layers: [...] }` (drawn automatically) or `{ kind: 'image', image: {...} }`.
 - Test results come from `src/data/testCases.ts`, linked by `projectSlug`. Only real, observed results belong there.
+
+## Test cases, vlogs, resume, experience and About
+
+Each page reads one data file; every file starts with a commented example of all its fields. As with projects, anything left out shows a *To be added* box, so never fill a field with placeholder claims.
+
+| Page | Data file | Notes |
+|---|---|---|
+| Test Cases (`#/test-cases`) | `src/data/testCases.ts` | `projectSlug` must match a project. A `pass`/`fail` status needs an `actual` result (development throws otherwise); leave `actual` out for `not-run`. Evidence images go in `public/assets/projects/<slug>/tests/`. Filters are in the URL: `?project=<slug>&status=pass\|fail\|blocked\|not-run`, which is how project pages link here. |
+| Vlogs (`#/vlogs`) | `src/data/vlogs.ts` | `youtubeId` (played via youtube-nocookie.com, only after a click) or a self-hosted `src`. Own thumbnails go in `public/assets/vlogs/`; without one a pixel placeholder is drawn. Categories: `development-journey`, `behind-the-scenes`, `project-showcase`, `tutorial`. `?v=<id>` opens a video in the player. |
+| Experience (`#/experience`) | `src/data/experience.ts` | Newest role first. Dates are `'YYYY-MM'`; use `PRESENT` for an ongoing role. Project entries with a `projectSlug` link to that project page. The Resume shows a condensed version. |
+| Resume (`#/resume`) and About (`#/about`) | `src/data/profile.ts` | Shared profile: summary, skills, education, achievements, contact links (only an email you are happy to publish), introduction, journey, interests, goals and current learning. "Dev only" checklists on both pages list what is still missing. |
+
+**Resume PDF:** put the file at `public/documents/resume.pdf` and set `resumePdf: 'documents/resume.pdf'` in `profile.ts`. The link is resolved with the site base path, so it works on both GitHub Pages URL forms. Until it is set, the page shows a *To be added* box instead of a broken link.
 
 ## Adding a page
 
