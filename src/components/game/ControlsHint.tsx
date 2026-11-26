@@ -7,7 +7,7 @@ const CONTROLS: { keys: string[]; action: string }[] = [
 
 /**
  * Small keyboard legend over the game. Shown only on devices with a precise
- * pointer (keyboard likely); touch controls arrive in Phase 8.
+ * pointer (keyboard likely); touch screens get TouchControls instead.
  */
 export function ControlsHint() {
   return (

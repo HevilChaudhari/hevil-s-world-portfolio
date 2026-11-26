@@ -15,11 +15,11 @@ interface ActiveDialogue extends InteractionTriggered {
 }
 
 /**
- * React layer drawn over the game canvas: controls legend, interaction prompt
- * and dialogue window. Freezes player input while a dialogue or the site menu
+ * React layer drawn over the game canvas: controls legend (keyboard only),
+ * interaction prompt and dialogue window. Freezes player input while a dialogue or the site menu
  * is open, and opens the menu on Esc (the in-game pause / menu key).
  */
-export function GameHud() {
+export function GameHud({ touch = false }: { touch?: boolean }) {
   const { openPage } = useSiteNavigation();
   const menu = useMenu();
   const [focus, setFocus] = useState<InteractionFocus | null>(null);
@@ -54,11 +54,11 @@ export function GameHud() {
   return (
     <div className="pointer-events-none absolute inset-0">
       {/* The legend gives way to the prompt so they never overlap on small screens. */}
-      {!isLocked && !focus && <ControlsHint />}
-      {!isLocked && focus && <InteractionPrompt focus={focus} />}
+      {!isLocked && !focus && !touch && <ControlsHint />}
+      {!isLocked && focus && <InteractionPrompt focus={focus} touch={touch} />}
       {/* Polite live region: announces what can be interacted with to screen readers. */}
       <p className="sr-only" aria-live="polite">
-        {focus && !isLocked ? `${focus.label}. Press E.` : ''}
+        {focus && !isLocked ? `${focus.label}. ${touch ? 'Tap Use.' : 'Press E.'}` : ''}
       </p>
       {active && (
         <DialogueBox

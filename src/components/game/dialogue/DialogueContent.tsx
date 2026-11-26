@@ -102,7 +102,8 @@ export function DialogueContent({ heading, subheading, portrait, text, choices, 
 
         {/* Full text for assistive tech; the typed version is visual only. */}
         <p className="sr-only">{text}</p>
-        <p aria-hidden="true" className="mt-1 min-h-[3lh] text-sm leading-relaxed sm:text-base">
+        {/* Tapping or clicking the text skips the typing (touch has no E key). */}
+        <p aria-hidden="true" onClick={done ? undefined : finish} className="mt-1 min-h-[3lh] text-sm leading-relaxed sm:text-base">
           {shown}
           {!done && <span className="motion-safe:animate-pulse">▍</span>}
         </p>
@@ -135,6 +136,7 @@ export function DialogueContent({ heading, subheading, portrait, text, choices, 
         <p className="mt-2 hidden text-right text-[11px] text-soil [@media(hover:hover)_and_(pointer:fine)]:block">
           {done ? '↑↓ choose · E / Enter select · Esc close' : 'E / Enter to skip'}
         </p>
+        <p className="mt-2 hidden text-right text-[11px] text-soil [@media(pointer:coarse)]:block">{done ? 'Tap a choice' : 'Tap the text to skip'}</p>
       </div>
     </section>
   );

@@ -46,6 +46,10 @@ Dev-only helpers:
 | Esc | Open the site menu (every page plus fast travel); Esc again closes it |
 | In dialogue | E / Enter / Space: skip typing, then select · ↑↓ or W/S: move · 1-9: pick a choice · Esc: close |
 
+**Touch screens** (phones, tablets, or any device once the screen is touched) get on-screen controls instead of the keyboard legend: ◀ ▶ to walk (slide a finger between them without lifting), **Jump** (hold for a higher jump), and **Use** to talk, read or enter (enabled when something is in range; the prompt above it can be tapped too). In dialogue, tap the text to skip typing and tap a choice. In portrait the controls sit below the game; in landscape, beside it. Keyboards keep working alongside touch.
+
+**Simple view:** the "Simple view" button on the village (or the switch at the bottom of the menu) replaces the game with a directory of every building and page. The choice is remembered in localStorage (`hevils-world:nav-mode`), and Phaser is not downloaded at all in this mode. "Play the village" or any "Walk there in the village" button switches back.
+
 ## Routes
 
 | Route | Page | Building |

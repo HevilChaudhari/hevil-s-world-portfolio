@@ -1,6 +1,7 @@
 import type { BuildingId } from '@/data/buildings';
 import type { SceneKey } from '../config/constants';
 import type { InteractionFocus, InteractionTriggered } from '../interactions/types';
+import type { VirtualButtons } from './VirtualInput';
 
 /**
  * Typed contract for every message that crosses the Phaser <-> React boundary.
@@ -24,6 +25,8 @@ export interface GameEventMap {
   'ui-interact-request': null;
   /** Fast travel: move the player to a building's door. */
   'ui-travel': { building: BuildingId };
+  /** On-screen touch buttons changed (sent on every change, released when hidden). */
+  'ui-virtual-input': VirtualButtons;
 }
 
 export type GameEventName = keyof GameEventMap;

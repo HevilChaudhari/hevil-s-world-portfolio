@@ -19,6 +19,7 @@ import { validatePlacements } from '../maps/validateMap';
 import { VILLAGE_MAP } from '../maps/villageMap';
 import { EventBus } from '../systems/EventBus';
 import { KeyboardInput, NEUTRAL_INTENT } from '../systems/KeyboardInput';
+import { VirtualInput } from '../systems/VirtualInput';
 import { ParallaxBackground } from '../systems/ParallaxBackground';
 
 /** Parallax factor shared by the hills strip and the windmills standing on them. */
@@ -36,6 +37,7 @@ const colToX = (col: number) => col * TILE_SIZE + TILE_SIZE / 2;
 export class VillageScene extends Phaser.Scene {
   private player!: Player;
   private keyboardInput!: KeyboardInput;
+  private virtualInput!: VirtualInput;
   private parallax!: ParallaxBackground;
   private interactions!: InteractionSystem;
   private windmillBlades: Phaser.GameObjects.Image[] = [];
@@ -80,6 +82,7 @@ export class VillageScene extends Phaser.Scene {
     this.physics.add.collider(this.player, obstacles);
 
     this.keyboardInput = new KeyboardInput(this);
+    this.virtualInput = new VirtualInput();
     this.interactions = new InteractionSystem(this, interactables);
     this.listenForUiEvents();
 
@@ -95,7 +98,8 @@ export class VillageScene extends Phaser.Scene {
 
   update(time: number, delta: number): void {
     const animate = this.registry.get(REGISTRY_KEYS.reducedMotion) !== true;
-    const input = this.keyboardInput.read();
+    // Keyboard and on-screen touch buttons feed the same intent.
+    const input = this.virtualInput.mergeInto(this.keyboardInput.read());
 
     const { consumedUp } = this.interactions.update({
       playerX: this.player.x,
@@ -125,7 +129,10 @@ export class VillageScene extends Phaser.Scene {
       }),
       EventBus.on('ui-travel', ({ building }) => this.teleportTo(this.resolveSpawnX({ building }))),
     ];
-    const cleanup = () => unsubscribers.forEach((off) => off());
+    const cleanup = () => {
+      unsubscribers.forEach((off) => off());
+      this.virtualInput.destroy();
+    };
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, cleanup);
   }

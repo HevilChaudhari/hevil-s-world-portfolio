@@ -1,12 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '@/app/routes';
-import { BUILDINGS, type BuildingId } from '@/data/buildings';
-import { getPage } from '@/data/pages';
 import { isPlainClick, useSiteNavigation } from '@/hooks/useSiteNavigation';
+import { useNavMode } from '@/hooks/useNavMode';
+import { BuildingDirectory } from './BuildingDirectory';
 import { useMenu } from './menuContext';
-
-const BUILDING_ORDER = Object.keys(BUILDINGS) as BuildingId[];
 
 /**
  * Building selection menu: every location with its pages, plus "Walk there"
@@ -15,7 +13,8 @@ const BUILDING_ORDER = Object.keys(BUILDINGS) as BuildingId[];
 export function SiteMenu() {
   const { isOpen, close } = useMenu();
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const { openPage, goToVillage, travelTo } = useSiteNavigation();
+  const { goToVillage, travelTo } = useSiteNavigation();
+  const [navMode, setNavMode] = useNavMode();
   const onVillage = useLocation().pathname === ROUTES.home;
 
   useEffect(() => {
@@ -68,44 +67,34 @@ export function SiteMenu() {
           </Link>
         )}
 
-        <ul className="grid gap-4 sm:grid-cols-2">
-          {BUILDING_ORDER.map((id) => {
-            const building = BUILDINGS[id];
-            const pages = building.pages.map((pageId) => ({ id: pageId, ...getPage(pageId) })).filter((p) => p.available);
-            return (
-              <li key={id} className="flex flex-col bg-white/60 p-4 pixel-border">
-                <h3 className="font-pixel text-sm font-bold">{building.name}</h3>
-                <ul className="mt-2 flex flex-1 flex-col gap-2">
-                  {pages.map((page) => (
-                    <li key={page.id}>
-                      <Link
-                        to={page.path}
-                        onClick={(e) => {
-                          if (!isPlainClick(e)) return;
-                          e.preventDefault();
-                          thenClose(() => openPage(page.id));
-                        }}
-                        className="group block"
-                      >
-                        <span className="font-semibold text-soil-dark underline decoration-2 underline-offset-2 group-hover:decoration-sunset">
-                          {page.title}
-                        </span>
-                        <span className="block text-xs text-soil">{page.summary}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  type="button"
-                  onClick={() => thenClose(() => travelTo(id))}
-                  className="mt-3 self-start bg-wheat px-3 py-1 text-xs text-soil-dark pixel-button hover:bg-meadow"
-                >
-                  Walk there in the village
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+        <BuildingDirectory
+          onBeforeNavigate={close}
+          onTravel={(id) => {
+            // Fast travel needs the game: leave Simple view first.
+            setNavMode('game');
+            travelTo(id);
+          }}
+        />
+
+        <p className="mt-5 flex flex-wrap items-center gap-3 border-t-2 border-soil/20 pt-4 text-sm">
+          <span>Home page:</span>
+          <button
+            type="button"
+            aria-pressed={navMode === 'game'}
+            onClick={() => thenClose(() => setNavMode('game'))}
+            className={`px-3 py-1 text-xs pixel-button ${navMode === 'game' ? 'bg-wheat' : 'bg-white hover:bg-parchment'}`}
+          >
+            Play the village
+          </button>
+          <button
+            type="button"
+            aria-pressed={navMode === 'simple'}
+            onClick={() => thenClose(() => setNavMode('simple'))}
+            className={`px-3 py-1 text-xs pixel-button ${navMode === 'simple' ? 'bg-wheat' : 'bg-white hover:bg-parchment'}`}
+          >
+            Simple view (no game)
+          </button>
+        </p>
       </div>
     </dialog>
   );

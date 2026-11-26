@@ -138,7 +138,7 @@ The [development guide](docs/DEVELOPMENT.md) covers editing the village layout, 
 - [x] Projects listing and data-driven project pages
 - [x] Test Cases, Vlogs, Resume, Experience and About pages (data-driven; content being filled in)
 - [ ] Technical Notes and Architecture pages
-- [ ] Mobile controls and responsive layouts
+- [x] Mobile touch controls, Simple view and responsive layouts
 - [ ] Performance work and automated tests
 - [ ] Automated GitHub Pages deployment
 
